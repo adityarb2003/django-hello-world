@@ -1,0 +1,22 @@
+{% extends 'hackernews/base.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Edit Profile</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="field">
+            <label for="{{ form.bio.id_for_label }}">About:</label>
+            {{ form.bio }}
+            {% if form.bio.errors %}
+            <div class="error">{{ form.bio.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="field">
+            <button type="submit" class="btn">Update Profile</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

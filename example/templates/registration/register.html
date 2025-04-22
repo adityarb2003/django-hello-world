@@ -1,0 +1,47 @@
+{% extends 'hackernews/base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Register</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="field">
+            <label for="{{ form.username.id_for_label }}">Username:</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+            <div class="error">{{ form.username.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="field">
+            <label for="{{ form.email.id_for_label }}">Email:</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+            <div class="error">{{ form.email.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="field">
+            <label for="{{ form.password1.id_for_label }}">Password:</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+            <div class="error">{{ form.password1.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="field">
+            <label for="{{ form.password2.id_for_label }}">Confirm Password:</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+            <div class="error">{{ form.password2.errors.0 }}</div>
+            {% endif %}
+        </div>
+        {% if form.non_field_errors %}
+        <div class="error">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+        <div class="field">
+            <button type="submit" class="btn">Register</button>
+        </div>
+    </form>
+    <p>Already have an account? <a href="{% url 'login' %}">Login here</a>.</p>
+</div>
+{% endblock %}

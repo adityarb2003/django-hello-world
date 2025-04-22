@@ -1,0 +1,29 @@
+{% extends 'hackernews/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Login</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="field">
+            <label for="id_username">Username:</label>
+            <input type="text" name="username" id="id_username" required>
+        </div>
+        <div class="field">
+            <label for="id_password">Password:</label>
+            <input type="password" name="password" id="id_password" required>
+        </div>
+        {% if form.errors %}
+        <div class="error">
+            Your username and password didn't match. Please try again.
+        </div>
+        {% endif %}
+        <div class="field">
+            <button type="submit" class="btn">Login</button>
+        </div>
+    </form>
+    <p>Don't have an account? <a href="{% url 'register' %}">Register here</a>.</p>
+</div>
+{% endblock %}

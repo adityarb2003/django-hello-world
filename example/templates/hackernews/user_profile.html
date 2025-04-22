@@ -1,0 +1,60 @@
+{% extends 'hackernews/base.html' %}
+
+{% block title %}{{ profile_user.username }} | Hacker News Clone{% endblock %}
+
+{% block content %}
+<div class="profile">
+    <h2>User: {{ profile_user.username }}</h2>
+    <div class="profile-info">
+        <p>Joined: {{ profile_user.date_joined|date:"F j, Y" }}</p>
+        <p>Karma: {{ profile.karma }}</p>
+        {% if profile.bio %}
+        <p>About: {{ profile.bio }}</p>
+        {% endif %}
+        
+        {% if user == profile_user %}
+        <p><a href="{% url 'edit_profile' %}">Edit profile</a></p>
+        {% endif %}
+    </div>
+    
+    <h3>Submissions</h3>
+    <ul class="story-list">
+        {% for story in stories %}
+        <li class="story-item">
+            <div>
+                <a href="{{ story.url|default:story.get_absolute_url }}" class="story-title">{{ story.title }}</a>
+                {% if story.get_domain %}
+                <span class="domain">({{ story.get_domain }})</span>
+                {% endif %}
+                <div class="story-meta">
+                    {{ story.score }} points | 
+                    {{ story.created_at|timesince }} ago | 
+                    <a href="{% url 'story_detail' story.id %}">{{ story.comments.count }} comment{{ story.comments.count|pluralize }}</a>
+                </div>
+            </div>
+        </li>
+        {% empty %}
+        <li>No submissions yet.</li>
+        {% endfor %}
+    </ul>
+    
+    <h3>Comments</h3>
+    <ul class="comments-list">
+        {% for comment in comments %}
+        <li class="comment">
+            <div class="comment-meta">
+                <a href="{% url 'story_detail' comment.story.id %}">{{ comment.story.title }}</a> | 
+                {{ comment.created_at|timesince }} ago
+            </div>
+            <div class="comment-text">
+                {{ comment.text|linebreaks }}
+            </div>
+        </li>
+        {% empty %}
+        <li>No comments yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
+                

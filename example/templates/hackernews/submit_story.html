@@ -1,0 +1,39 @@
+{% extends 'hackernews/base.html' %}
+
+{% block title %}Submit | Hacker News Clone{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Submit</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="field">
+            <label for="{{ form.title.id_for_label }}">Title:</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+            <div class="error">{{ form.title.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="field">
+            <label for="{{ form.url.id_for_label }}">URL:</label>
+            {{ form.url }}
+            {% if form.url.errors %}
+            <div class="error">{{ form.url.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <div class="field">
+            <label for="{{ form.text.id_for_label }}">Text (optional):</label>
+            {{ form.text }}
+            {% if form.text.errors %}
+            <div class="error">{{ form.text.errors.0 }}</div>
+            {% endif %}
+        </div>
+        {% if form.non_field_errors %}
+        <div class="error">{{ form.non_field_errors.0 }}</div>
+        {% endif %}
+        <div class="field">
+            <button type="submit" class="btn">Submit</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

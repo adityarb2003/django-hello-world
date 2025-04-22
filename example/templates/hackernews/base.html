@@ -1,0 +1,256 @@
+<!-- hackernews/templates/hackernews/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TechBit{% endblock %}</title>
+    <style>
+        /* HN-style CSS */
+        body {
+            font-family: Verdana, Geneva, sans-serif;
+            font-size: 10pt;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #ff6600;
+            color: #000;
+            padding: 2px;
+            display: flex;
+            align-items: center;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        .header a {
+            color: #000;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        .header a:hover {
+            text-decoration: underline;
+        }
+        .logo {
+            border: 1px solid white;
+            margin-right: 5px;
+        }
+        .content {
+            padding: 10px;
+            background-color: #f6f6ef;
+            min-height: calc(100vh - 40px);
+        }
+        .story-list {
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+        }
+        .story-item {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: baseline;
+        }
+        .story-title {
+            font-size: 10pt;
+            color: #000;
+            text-decoration: none;
+        }
+        .story-title:visited {
+            color: #828282;
+        }
+        .story-meta, .comment-meta {
+            font-size: 8pt;
+            color: #828282;
+        }
+        .story-meta a, .comment-meta a {
+            color: #828282;
+            text-decoration: none;
+        }
+        .story-meta a:hover, .comment-meta a:hover {
+            text-decoration: underline;
+        }
+        .upvote {
+            color: #828282;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .comments {
+            margin-top: 20px;
+        }
+        .comment {
+            margin-bottom: 10px;
+            overflow-wrap: break-word;
+        }
+        .comment-text {
+            font-size: 9pt;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        .indented {
+            margin-left: 40px;
+        }
+        .pagination {
+            margin-top: 20px;
+            font-size: 10pt;
+        }
+        .form-container {
+            margin-top: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="password"], input[type="email"], textarea, input[type="url"] {
+            width: 100%;
+            max-width: 500px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        textarea {
+            height: 100px;
+        }
+        .btn {
+            background-color: #ff6600;
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .messages {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+        .search-form {
+            display: inline;
+            margin-left: 10px;
+        }
+        .search-input {
+            font-size: 10pt;
+            padding: 1px;
+            width: 130px;
+        }
+        .item-num {
+            color: #828282;
+            margin-right: 5px;
+        }
+        .domain {
+            color: #828282;
+            font-size: 8pt;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <a href="{% url 'home' %}">
+                <span class="logo">&nbsp;Y&nbsp;</span>
+            </a>
+            <a href="{% url 'home' %}"><b>TechBit</b></a>
+            <a href="{% url 'newest' %}">new</a>
+            <a href="{% url 'submit_story' %}">submit</a>
+        </div>
+        <div style="flex-grow: 1;"></div>
+        <div class="header-right">
+            <form class="search-form" action="{% url 'search' %}" method="get">
+                <input class="search-input" type="text" name="q" placeholder="Search">
+            </form>
+            {% if user.is_authenticated %}
+                <a href="{% url 'user_profile' user.username %}">{{ user.username }}</a>
+                <a href="{% url 'logout' %}">logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">login</a>
+                <a href="{% url 'register' %}">register</a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="content">
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </div>
+    
+    <script>
+        // Utility function for making AJAX requests
+        function ajaxRequest(url, method, successCallback) {
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, url, true);
+            xhr.setRequestHeader('X-CSRFToken', getCookie('csrftoken'));
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        successCallback(response);
+                    }
+                }
+            };
+            xhr.send();
+        }
+        
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Handle upvote clicks
+        document.addEventListener('DOMContentLoaded', function() {
+            const upvoteLinks = document.querySelectorAll('.upvote');
+            upvoteLinks.forEach(function(link) {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const storyId = this.getAttribute('data-id');
+                    const upvoteUrl = `/upvote/${storyId}/`;
+                    
+                    ajaxRequest(upvoteUrl, 'POST', function(response) {
+                        if (response.success) {
+                            const upvoteElement = document.querySelector(`.upvote[data-id="${storyId}"]`);
+                            if (response.action === 'added') {
+                                upvoteElement.textContent = '▼'; // Change to down arrow
+                            } else {
+                                upvoteElement.textContent = '▲'; // Change back to up arrow
+                            }
+                            // Update the score if it's displayed
+                            const scoreElement = document.getElementById(`score-${storyId}`);
+                            if (scoreElement) {
+                                let currentScore = parseInt(scoreElement.textContent);
+                                if (response.action === 'added') {
+                                    scoreElement.textContent = currentScore + 1;
+                                } else {
+                                    scoreElement.textContent = currentScore - 1;
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

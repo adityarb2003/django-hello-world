@@ -1,0 +1,30 @@
+{% extends 'hackernews/base.html' %}
+
+{% block title %}Search Results for "{{ query }}" | Hacker News Clone{% endblock %}
+
+{% block content %}
+<h2>Search Results for "{{ query }}"</h2>
+<ol class="story-list">
+    {% for story in stories %}
+    <li class="story-item">
+        <span class="upvote" data-id="{{ story.id }}">{% if user.is_authenticated %}▲{% endif %}</span>
+        <div>
+            <div>
+                <a href="{{ story.url|default:story.get_absolute_url }}" class="story-title">{{ story.title }}</a>
+                {% if story.get_domain %}
+                <span class="domain">({{ story.get_domain }})</span>
+                {% endif %}
+            </div>
+            <div class="story-meta">
+                <span id="score-{{ story.id }}">{{ story.score }}</span> points by 
+                <a href="{% url 'user_profile' story.user.username %}">{{ story.user.username }}</a> 
+                {{ story.created_at|timesince }} ago | 
+                <a href="{% url 'story_detail' story.id %}">{{ story.comments.count }} comment{{ story.comments.count|pluralize }}</a>
+            </div>
+        </div>
+    </li>
+    {% empty %}
+    <li>No results found for "{{ query }}".</li>
+    {% endfor %}
+</ol>
+{% endblock %}

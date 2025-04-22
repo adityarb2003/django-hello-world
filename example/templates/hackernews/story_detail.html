@@ -1,0 +1,54 @@
+<!-- hackernews/templates/hackernews/story_detail.html -->
+{% extends 'hackernews/base.html' %}
+
+{% block title %}{{ story.title }} | Hacker News Clone{% endblock %}
+
+{% block content %}
+<div class="story-detail">
+    <div class="story-item">
+        <span class="upvote" data-id="{{ story.id }}">
+            {% if user.is_authenticated %}
+                {% if user_voted %}▼{% else %}▲{% endif %}
+            {% endif %}
+        </span>
+        <div>
+            <div>
+                <a href="{{ story.url|default:'#' }}" class="story-title">{{ story.title }}</a>
+                {% if story.get_domain %}
+                <span class="domain">({{ story.get_domain }})</span>
+                {% endif %}
+            </div>
+            <div class="story-meta">
+                <span id="score-{{ story.id }}">{{ story.score }}</span> points by 
+                <a href="{% url 'user_profile' story.user.username %}">{{ story.user.username }}</a> 
+                {{ story.created_at|timesince }} ago | 
+                {{ story.comments.count }} comment{{ story.comments.count|pluralize }}
+            </div>
+        </div>
+    </div>
+    
+    {% if story.text %}
+    <div class="story-text" style="margin-left: 30px; margin-top: 10px;">
+        {{ story.text|linebreaks }}
+    </div>
+    {% endif %}
+    
+    {% if user.is_authenticated %}
+    <div class="form-container" style="margin-left: 30px; margin-top: 20px;">
+        <form method="post" action="{% url 'story_detail' story.id %}">
+            {% csrf_token %}
+            <div class="field">
+                {{ form.text }}
+            </div>
+            <div class="field">
+                <button type="submit" class="btn">Add Comment</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+    
+    <div class="comments" style="margin-top: 20px;">
+        {% include 'hackernews/comments.html' with comments=comments %}
+    </div>
+</div>
+{% endblock %}
